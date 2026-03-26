@@ -1,4 +1,4 @@
-import { IsEthereumAddress, IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsEthereumAddress, IsNotEmpty, IsString, Matches } from "class-validator";
 
 const UNSIGNED_INTEGER_PATTERN = /^\d+$/;
 
@@ -12,14 +12,14 @@ export class CreateRedemptionDto {
   @IsString()
   @IsNotEmpty()
   @Matches(UNSIGNED_INTEGER_PATTERN, {
-    message: 'amount must be a base-10 unsigned integer string',
+    message: "amount must be a base-10 unsigned integer string",
   })
   amount!: string;
 
   @IsString()
   @IsNotEmpty()
   @Matches(UNSIGNED_INTEGER_PATTERN, {
-    message: 'nonce must be a base-10 unsigned integer string',
+    message: "nonce must be a base-10 unsigned integer string",
   })
   nonce!: string;
 

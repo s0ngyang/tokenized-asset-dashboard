@@ -45,7 +45,7 @@ export class RedemptionsService {
       amount: amount.toString(),
       nonce: BigInt(payload.nonce).toString(),
       signature: payload.signature,
-      status: "pending",
+      status: "Pending",
       createdAt: new Date().toISOString(),
     };
 

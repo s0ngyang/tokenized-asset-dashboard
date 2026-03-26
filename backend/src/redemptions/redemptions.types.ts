@@ -5,6 +5,6 @@ export interface RedemptionRecord {
   amount: string;
   nonce: string;
   signature: string;
-  status: 'pending';
+  status: string;
   createdAt: string;
 }

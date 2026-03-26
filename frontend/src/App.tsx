@@ -107,17 +107,6 @@ function formatUsd(amount: number) {
   }).format(amount);
 }
 
-async function switchToSepolia() {
-  if (!window.ethereum?.request) {
-    return;
-  }
-
-  await window.ethereum.request({
-    method: "wallet_switchEthereumChain",
-    params: [{ chainId: "0xaa36a7" }],
-  });
-}
-
 export default function App() {
   const [wallet, setWallet] = useState<WalletState>(initialWalletState);
   const [loadingBalances, setLoadingBalances] = useState(false);
@@ -177,7 +166,11 @@ export default function App() {
     setLoadingBalances(true);
 
     try {
-      const browserProvider = provider ?? new BrowserProvider(window.ethereum!);
+      if (!window.ethereum) {
+        throw new Error("Wallet not connected");
+      }
+
+      const browserProvider = provider ?? new BrowserProvider(window.ethereum);
       const network = await browserProvider.getNetwork();
       const chainId = Number(network.chainId);
       const chainLabel = CHAIN_LABELS[chainId];
@@ -230,7 +223,11 @@ export default function App() {
     }
   }
 
-  async function loadRedemptions(address: string) {
+  async function loadRedemptions(address: string | null) {
+    if (!wallet.address) {
+      return;
+    }
+
     try {
       const response = await fetch(`${BACKEND_URL}/redemptions/${address}`);
 
@@ -284,7 +281,15 @@ export default function App() {
 
   async function handleSwitchToSepolia() {
     try {
-      await switchToSepolia();
+      if (!window.ethereum?.request) {
+        return;
+      }
+
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: "0xaa36a7" }],
+      });
+
       setFeedback(null);
     } catch (error) {
       setFeedback({
@@ -316,6 +321,10 @@ export default function App() {
     try {
       const amount = parseUnits(redeemAmount || "0", wallet.tokenDecimals);
 
+      if (!window.ethereum) {
+        throw new Error("Wallet not connected");
+      }
+
       if (amount <= 0n) {
         throw new Error("Amount must be greater than 0");
       }
@@ -327,7 +336,7 @@ export default function App() {
       setSubmitting(true);
       setFeedback(null);
 
-      const browserProvider = new BrowserProvider(window.ethereum!);
+      const browserProvider = new BrowserProvider(window.ethereum);
       const signer = await browserProvider.getSigner();
       const walletAddress = getAddress(wallet.address);
       const nonce = BigInt(Date.now());
@@ -368,14 +377,9 @@ export default function App() {
       setRedeemAmount("");
       await loadRedemptions(walletAddress);
     } catch (error) {
-      const message =
-        typeof error === "object" && error !== null && "info" in error
-          ? ((error as { info?: { error?: { message?: string } } }).info?.error?.message ?? null)
-          : null;
-
       setFeedback({
         kind: "error",
-        message: message ?? (error instanceof Error ? error.message : "Unable to submit redemption"),
+        message: error instanceof Error ? error.message : "Unable to submit redemption",
       });
     } finally {
       setSubmitting(false);
@@ -515,7 +519,9 @@ export default function App() {
               <strong>{networkDisplay}</strong>
             </div>
             <div className="stat-row">
-              <span className="stat-label">{hasConnectedWallet ? `${wallet.nativeSymbol} Balance` : "Native Balance"}</span>
+              <span className="stat-label">
+                {hasConnectedWallet ? `${wallet.nativeSymbol} Balance` : "Native Balance"}
+              </span>
               <strong>{nativeBalanceDisplay}</strong>
             </div>
             <div className="stat-row">
@@ -523,7 +529,9 @@ export default function App() {
               <strong>{trackedTokenDisplay}</strong>
             </div>
             <div className="stat-row">
-              <span className="stat-label">{hasConnectedWallet ? `${wallet.tokenSymbol} Balance` : "Tracked Token Balance"}</span>
+              <span className="stat-label">
+                {hasConnectedWallet ? `${wallet.tokenSymbol} Balance` : "Tracked Token Balance"}
+              </span>
               <strong>{tokenBalanceDisplay}</strong>
             </div>
             <div className="stat-row">
@@ -557,7 +565,7 @@ export default function App() {
               {submitting ? "Submitting..." : "Submit Redemption"}
             </button>
           </form>
-          <p className="muted-copy">Off chain redemption of Sepolia USDC test token (EIP-712)</p>
+          <p className="muted-copy pt-2">Off chain redemption of Sepolia USDC test token (EIP-712)</p>
         </article>
       </section>
 
@@ -565,7 +573,7 @@ export default function App() {
         <div className="panel-header-row max-[760px]:flex-col max-[760px]:items-stretch">
           <h2>Redemption Requests</h2>
           {wallet.address ? (
-            <button className="secondary-button" onClick={() => loadRedemptions(wallet.address!)} type="button">
+            <button className="secondary-button" onClick={() => loadRedemptions(wallet.address)} type="button">
               Refresh
             </button>
           ) : null}
