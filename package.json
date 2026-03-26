@@ -1,0 +1,12 @@
+{
+  "name": "tokenized-asset-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.18.1",
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend start:dev",
+    "build": "pnpm --filter backend build && pnpm --filter frontend build",
+    "test:backend": "pnpm --filter backend test"
+  }
+}
