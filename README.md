@@ -1,22 +1,9 @@
 # Tokenized Asset Dashboard
 
-Mini full-stack dashboard for the Libeara take-home assignment. The app lets an investor connect a MetaMask wallet, view the connected chain's native balance, track the Sepolia test USDC token used in the exercise, calculate portfolio value from a fixed NAV, and submit signed off-chain redemption requests that are verified by a NestJS backend.
-
-## Stack
-
 - Frontend: React + Vite + TypeScript + Tailwind
 - Backend: NestJS + TypeScript
 - Blockchain library: `ethers` v6
 - Network: Ethereum Sepolia
-
-## Project Structure
-
-```text
-tokenized-asset-dashboard/
-├── frontend/   # React app
-├── backend/    # NestJS API
-└── README.md
-```
 
 ## Setup
 
@@ -28,31 +15,15 @@ From the repo root:
 pnpm install
 ```
 
-### 2. Configure environment variables
-
-Frontend:
-
-```bash
-cp frontend/.env.example frontend/.env
-```
-
-Backend:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-Default values already point at a Sepolia Infura RPC and the local backend/frontend URLs.
-
-### 3. Run the backend
+### 2. Run the backend
 
 ```bash
 pnpm dev:backend
 ```
 
-The API will start on `http://localhost:3000`.
+The server will listen on `http://localhost:3000`.
 
-### 4. Run the frontend
+### 3. Run the frontend
 
 In a second terminal:
 
@@ -64,30 +35,29 @@ The app will start on `http://localhost:5173`.
 
 ## Features Implemented
 
-### Frontend
+### Core Requirements
 
-- MetaMask wallet connection using `window.ethereum` and `ethers.BrowserProvider`
-- Graceful handling for disconnects, account changes, chain changes, reconnect on refresh, and manual disconnect state reset
-- Display of the connected chain's native token balance
-- Display of the Sepolia test USDC token balance for `0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8`
-- Token symbol, token address, and decimal-aware formatting
-- Portfolio value calculation using hardcoded NAV of `$1.0023` for the Sepolia redemption asset
-- Redemption form with client-side validation
-- EIP-712 signing with the required domain and type definitions
-- POST integration to the backend
-- Feedback state, Sepolia switch guidance, and redemption history display
+Frontend
 
-### Backend
+1. Wallet Connection
+2. Balance Display
+3. Portfolio Display
+4. Redemption Request Form
 
-- `POST /redemptions`
-- `GET /redemptions/:walletAddress`
-- DTO validation with `class-validator`
-- EIP-712 signature recovery with `ethers.verifyTypedData`
-- Signature-to-wallet matching with `401` on mismatch
-- On-chain `balanceOf` validation against Sepolia USDC
-- In-memory storage with generated UUIDs and `pending` status
-- Sorted redemption history, newest first
-- Global validation pipe and meaningful HTTP errors
+Backend
+
+1. POST /redemptions — Create a redemption request
+2. GET /redemptions/:walletAddress — List redemption requests
+3. Validation and Error Handling
+
+Unit tests
+
+1. Recovers the signer from a valid EIP-712 signature
+2. Throws when the signature does not match walletAddress
+
+### Bonus
+
+None
 
 ## API Contract
 
@@ -161,7 +131,7 @@ Included tests cover EIP-712 signature recovery and signature mismatch handling.
 - Used Vite instead of Next.js to keep the frontend focused and fast.
 - Stored redemption requests in memory because persistence is not required.
 - Kept the Sepolia USDC token address fixed in the backend to avoid accepting arbitrary ERC-20 contracts.
-- Used a Sepolia Infura RPC by default to reduce setup friction, while still allowing override through `.env`.
+- Used Sepolia Infura RPC as the other two providers did not work for me.
 
 ## Assumptions
 
