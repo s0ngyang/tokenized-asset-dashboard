@@ -5,6 +5,10 @@
 - Blockchain library: `ethers` v6
 - Network: Ethereum Sepolia
 
+## Video Walkthrough
+
+https://drive.google.com/file/d/1alef2QyzYaaffSAZQwhOC1MUy0PVYBpp/view?usp=sharing
+
 ## Setup
 
 ### 1. Install dependencies
